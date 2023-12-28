@@ -176,7 +176,7 @@
         <usecase id="UC_RAW_PLAYBACK" dev1="23" dyn_path="true" dsp_vol="false" mmap="true" period="64" period_num="32"/>
         <!-- for output with AUDIO_OUTPUT_FLAG_PRIMARY|AUDIO_OUTPUT_FLAG_FAST, 4 * 10ms buffer -->
         <usecase id="UC_LOW_LATENCY_PLAYBACK" dev1="1" dyn_path="true" dsp_vol="false" mmap="false" period="10" period_num="4"/>
-        <!-- for output with AUDIO_OUTPUT_FLAG_MMAP_NOIRQ, 40 periods * 48 frames/period(=1ms w/ 48k sample rate) * 2ch * 4(float) = 15360 bytes -->
+        <!-- for output with AUDIO_OUTPUT_FLAG_MMAP_NOIRQ, 40 periods * 48 frames/period(=1ms w/ 48k sample rate) * 2ch *4(float) = 15360 bytes -->
         <usecase id="UC_MMAP_PLAYBACK" dev1="0" dyn_path="true" dsp_vol="false" mmap="true" period="1" period_num="40"/>
         <!-- for output with AUDIO_OUTPUT_FLAG_DEEP_BUFFER, 4 * 20ms buffer -->
         <usecase id="UC_DEEP_BUFFER_PLAYBACK" dev1="5" dyn_path="true" dsp_vol="false" mmap="false" period="20" period_num="4"/>
@@ -207,9 +207,10 @@
     <dsp_latency>
         <usecase id="UC_LOW_LATENCY_PLAYBACK" type="playback">
             <be_cfg be_id="OUT_SPEAKER_BE_CFG" latency="20000"/>
-            <be_cfg be_id="OUT_USB_HEADSET_BE_CFG" latency="10000"/>
-            <be_cfg be_id="OUT_USB_HEADPHONE_BE_CFG" latency="10000"/>
-            <be_cfg be_id="OUT_A2DP_BE_CFG" latency="10000"/>
+            <be_cfg be_id="OUT_USB_HEADSET_BE_CFG" latency="60000"/>
+            <be_cfg be_id="OUT_USB_HEADPHONE_BE_CFG" latency="60000"/>
+            <be_cfg be_id="OUT_A2DP_BE_CFG" latency="60000"/>
+            <be_cfg be_id="OUT_BLE_BE_CFG" latency="60000"/>
         </usecase>
 
         <usecase id="UC_DEEP_BUFFER_PLAYBACK" type="playback">
@@ -217,11 +218,21 @@
             <be_cfg be_id="OUT_USB_HEADSET_BE_CFG" latency="70000"/>
             <be_cfg be_id="OUT_USB_HEADPHONE_BE_CFG" latency="70000"/>
             <be_cfg be_id="OUT_A2DP_BE_CFG" latency="180000"/>
+            <be_cfg be_id="OUT_BLE_BE_CFG" latency="80000"/>
+        </usecase>
+
+        <usecase id="UC_COMPRESSED_OFFLOAD_PLAYBACK" type="playback">
+            <be_cfg be_id="OUT_SPEAKER_BE_CFG" latency="40000"/>
+            <be_cfg be_id="OUT_USB_HEADSET_BE_CFG" latency="40000"/>
+            <be_cfg be_id="OUT_USB_HEADPHONE_BE_CFG" latency="40000"/>
+            <be_cfg be_id="OUT_A2DP_BE_CFG" latency="70000"/>
+            <be_cfg be_id="OUT_BLE_BE_CFG" latency="20000"/>
         </usecase>
 
         <usecase id="UC_IMMERSIVE_PLAYBACK" type="playback">
             <be_cfg be_id="OUT_A2DP_BE_CFG" latency="100000"/>
         </usecase>
+
 
         <usecase id="UC_AUDIO_RECORD" type="capture">
             <be_cfg be_id="IN_CAMCORDER_LANDSCAPE_BE_CFG" latency="160000"/>
@@ -240,6 +251,9 @@
     </dsp_latency>
 
     <soundcard_name name="google,aoc-snd-card" />
+    <features>
+        <feature name="BatteryThrottle=Type:BCL_VOLTAGE,Name:BCL_AUDIO_BAACL,Strategy:MediaSpeakerAndScreenOn"/>
+    </features>
 
     <cfg_attr>
         <cfg id="OUT_SPEAKER_BE_CFG" intf_name="TDM_RX_0" mux="HW_MUX_GP_0" tuning_id="2"/>
@@ -288,13 +302,13 @@
 
     <device_handle>
         <handler libname="audio_bt_aoc.so"/>
-        <handler libname="audio_usb_aoc.so" argu="MaxSamplingRate=96000,UnsupportedFormat=S24_LE"/>
+        <handler libname="audio_usb_aoc.so" argu="MaxSamplingRate=192000,UnsupportedFormat=S24_LE,MaxCapPacketInterval=125,MaxCapSampleRate=192000,MaxCapBitWidth=32,MaxCapChannel=2,EnableHifi192kMultichannel=0"/>
     </device_handle>
 
     <external_module>
+        <module libname="audio_spk_35l41.so" argu="AcousticShockProtection"/>
         <module libname="audio_waves_aoc.so" argu="Sink=SPK:1"/>
-        <module libname="audio_spk_35l41.so"/>
-        <module libname="audio_fortemedia_aoc.so"/>
+        <module libname="audio_fortemedia_aoc.so" argu="DL_CH=y VoIP_DLCHs=SPK:1,USB:1 VoIP_Rate=32000 BOOST_USB_SWB_CLK=y SHARED_MODULE=1130578253"/>
         <module libname="liboffloadeffect.so"/>
         <module libname="audio_amcs_ext.so"/>
         <module libname="audio_bluenote_aoc.so"/>
