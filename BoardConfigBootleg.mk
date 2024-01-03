@@ -7,6 +7,7 @@
 BUILD_BROKEN_DUP_RULES := true
 
 # Kernel
+KERNEL_LTO=thin
 TARGET_KERNEL_DTBO_PREFIX := dts/
 TARGET_KERNEL_DTBO := google/dtbo.img
 TARGET_KERNEL_DTB := \
